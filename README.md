@@ -1,1 +1,1 @@
-this is the "net-lab" directionary
+this is the "net-lab" directory
