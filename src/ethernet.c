@@ -11,6 +11,17 @@
  */
 void ethernet_in(buf_t *buf) {
     // TO-DO
+    //数据长度检查(若数据长度小于以太网头部长度，表明数据包不完整，应将其丢弃，不予处理。
+    if(buf->len < sizeof(ether_hdr_t)){
+        printf("The buf is not complete. Dispose.");
+    }
+    //移除以太网包头
+    ether_hdr_t *hdr = (ether_hdr_t *) buf->data;
+    net_protocol_t protocol = swap16(hdr->protocol16);
+    uint8_t *src = hdr->src;
+    buf_remove_header(buf, sizeof(ether_hdr_t));
+    //向上层传递数据包
+    net_in(buf, protocol, src);
 }
 /**
  * @brief 处理一个要发送的数据包
@@ -21,7 +32,24 @@ void ethernet_in(buf_t *buf) {
  */
 void ethernet_out(buf_t *buf, const uint8_t *mac, net_protocol_t protocol) {
     // TO-DO
+    //数据长度检查与填充（若数据长度不足 46 字节，需显式填充 0。
+    if(buf->len < 46){
+        buf_add_padding(buf, 46 - buf->len);
+    }
+    //添加以太网包头
+    buf_add_header(buf, sizeof(ether_hdr_t));
+    ether_hdr_t *hdr = (ether_hdr_t *)buf->data;
+    //填充目的mac地址
+    memcpy(hdr->dst, mac, NET_MAC_LEN);
+    //填写源MAC地址，即本机的MAC地址
+    memcpy(hdr->src, net_if_mac, NET_MAC_LEN);
+    //填写协议类型 protocol
+    hdr->protocol16 = swap16((uint16_t)protocol);
+    //发送数据帧
+    driver_send(buf);
 }
+
+
 /**
  * @brief 初始化以太网协议
  *

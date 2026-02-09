@@ -13,7 +13,7 @@
 #else
 #define NET_IF_IP        \
     {                    \
-        XX, XX, XX, XX \
+        192, 168, 116, 2 \
     }  // 自定义网卡ip地址
 #define NET_IF_MAC                         \
     {                                      \
@@ -26,7 +26,7 @@
 #define ARP_TIMEOUT_SEC (60 * 5)  // arp表过期时间
 #define ARP_MIN_INTERVAL 1        // 向相同地址发送arp请求的最小间隔
 
-#define IP_DEFALUT_TTL 64  // IP默认TTL
+#define IP_DEFAULT_TTL 64  // IP默认TTL
 
 #define BUF_MAX_LEN (2 * UINT16_MAX + UINT8_MAX)  // buf最大长度
 
